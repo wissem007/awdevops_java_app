@@ -126,7 +126,8 @@ pipeline{
              when { expression { params.action == 'create' } }
                  steps {
                     script {
-                     dockerImageRun("${params.ImageName}", "${params.ImageTag}", "${params.portMapping}", "${params.DockerHubUser}")
+                        sh "docker container run -d -p 8080:8080 --name app wissem007/javapp:v1"
+                    // dockerImageRun("${params.ImageName}", "${params.ImageTag}", "${params.portMapping}", "${params.DockerHubUser}")
         }
         }
     }
