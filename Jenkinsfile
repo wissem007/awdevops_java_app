@@ -113,12 +113,12 @@ pipeline{
         }      
 
         stage('Run Docker Container') {
-            steps {
-                // Étape 3 : Exécution du conteneur Docker à partir de l'image poussée
-                script {
-                    dockerImageRun('my_app', 'latest', '8080:8080')
-                }
-            }
+            when { expression { params.action == 'create' } }
+                steps {
+                  script {
+                    dockerImageRun("${params.ImageName}", "${params.ImageTag}", "8080:8080")
+        }
+           }
         }
 
 
