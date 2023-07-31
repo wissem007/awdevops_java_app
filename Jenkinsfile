@@ -102,21 +102,31 @@ pipeline{
             }
         }
 
-        stage('Docker Image Cleanup : DockerHub '){
-         when { expression {  params.action == 'create' } }
-            steps{
-               script{
-                   
-                   dockerImageCleanup("${params.ImageName}","${params.ImageTag}","${params.DockerHubUser}")
-               }
+        stage('Docker Image Cleanup : DockerHub') {
+            when { expression { params.action == 'create' } }
+            steps {
+                script {
+                    // Vérifier si l'image existe avant de la supprimer
+                    def imageName = "${params.ImageName}:${params.ImageTag}"
+                    def imageExists = sh(returnStatus: true, script: "docker images -q ${imageName}").trim()
+
+                    if (imageExists) {
+                        // L'image existe, alors on peut la supprimer
+                        dockerImageCleanup("${params.ImageName}", "${params.ImageTag}", "${params.DockerHubUser}")
+                    } else {
+                        // L'image n'existe pas, afficher un message d'erreur ou avertissement
+                        echo "L'image ${imageName} n'existe pas. Aucune suppression nécessaire."
+                    }
+                }
             }
-        }      
+        }
+    
 
         stage('Run Docker Container') {
             when { expression { params.action == 'create' } }
                 steps {
                   script {
-                    dockerImageRun("${params.ImageName}", "${params.ImageTag}", "8080:8080")
+                    dockerImageRun("${params.ImageName}", "${params.ImageTag}", "${params.portMapping}")
         }
            }
         }
