@@ -114,14 +114,23 @@ pipeline{
 
     
 
+        // stage('Run Docker Container') {
+        //     when { expression { params.action == 'create' } }
+        //         steps {
+        //           script {
+        //             dockerImageRun("${params.ImageName}", "${params.ImageTag}", "${params.portMapping}")
+        // }
+        //    }
+        // }
         stage('Run Docker Container') {
-            when { expression { params.action == 'create' } }
-                steps {
-                  script {
-                    dockerImageRun("${params.ImageName}", "${params.ImageTag}", "${params.portMapping}")
+             when { expression { params.action == 'create' } }
+                 steps {
+                    script {
+                     dockerImageRun("${params.ImageName}", "${params.ImageTag}", "${params.portMapping}", "${params.DockerHubUser}")
         }
-           }
         }
+    }
+
 
 
    }
