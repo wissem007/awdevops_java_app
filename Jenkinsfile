@@ -102,6 +102,16 @@ pipeline{
             }
         }
 
+        stage('Docker Image Cleanup : DockerHub '){
+         when { expression {  params.action == 'create' } }
+            steps{
+               script{
+                   
+                   dockerImageCleanup("${params.ImageName}","${params.ImageTag}","${params.DockerHubUser}")
+               }
+            }
+        }      
+
         stage('Run Docker Container') {
             steps {
                 // Étape 3 : Exécution du conteneur Docker à partir de l'image poussée
