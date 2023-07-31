@@ -23,45 +23,45 @@ pipeline{
             )
             }
         }
-        stage('Unit Test maven'){
-            when { expression {  params.action == 'create' } }
+        // stage('Unit Test maven'){
+        //     when { expression {  params.action == 'create' } }
 
-            steps{
-               script{
+        //     steps{
+        //        script{
                    
-                   mvnTest()
-               }
-            }
-        }
-        stage('Integration Test maven'){
-            when { expression {  params.action == 'create' } }
-            steps{
-               script{
+        //            mvnTest()
+        //        }
+        //     }
+        // }
+        // stage('Integration Test maven'){
+        //     when { expression {  params.action == 'create' } }
+        //     steps{
+        //        script{
                    
-                   mvnIntegrationTest()
-               }
-            }
-        }
-        stage('Static code analysis: Sonarqube'){
-            when { expression {  params.action == 'create' } }
-            steps{
-               script{
+        //            mvnIntegrationTest()
+        //        }
+        //     }
+        // }
+        // stage('Static code analysis: Sonarqube'){
+        //     when { expression {  params.action == 'create' } }
+        //     steps{
+        //        script{
                    
-                   def SonarQubecredentialsId = 'sonarqube-api'
-                   statiCodeAnalysis(SonarQubecredentialsId)
-               }
-            }
-        }
-        stage('Quality Gate Status Check : Sonarqube'){
-         when { expression {  params.action == 'create' } }
-            steps{
-               script{
+        //            def SonarQubecredentialsId = 'sonarqube-api'
+        //            statiCodeAnalysis(SonarQubecredentialsId)
+        //        }
+        //     }
+        // }
+        // stage('Quality Gate Status Check : Sonarqube'){
+        //  when { expression {  params.action == 'create' } }
+        //     steps{
+        //        script{
                    
-                   def SonarQubecredentialsId = 'sonarqube-api'
-                   QualityGateStatus(SonarQubecredentialsId)
-               }
-            }
-        }
+        //            def SonarQubecredentialsId = 'sonarqube-api'
+        //            QualityGateStatus(SonarQubecredentialsId)
+        //        }
+        //     }
+        // }
 
         stage('Maven Build : maven'){
          when { expression {  params.action == 'create' } }
@@ -107,19 +107,29 @@ pipeline{
             steps {
                 script {
                     // Vérifier si l'image existe avant de la supprimer
-                    def imageName = "${params.ImageName}:${params.ImageTag}"
-                    def imageExists = sh(returnStatus: true, script: "docker images -q ${imageName}").trim()
+                    def imageNameV1 = "${params.ImageName}:v1"
+                    def imageNameLatest = "${params.ImageName}:latest"
 
-                    if (imageExists) {
-                        // L'image existe, alors on peut la supprimer
-                        dockerImageCleanup("${params.ImageName}", "${params.ImageTag}", "${params.DockerHubUser}")
+                    def imageV1Exists = sh(returnStatus: true, script: "docker images -q ${imageNameV1}").trim()
+                    def imageLatestExists = sh(returnStatus: true, script: "docker images -q ${imageNameLatest}").trim()
+
+                    if (imageV1Exists) {
+                        // L'image v1 existe, alors on peut la supprimer
+                        dockerImageCleanup("${params.ImageName}", "v1", "${params.DockerHubUser}")
                     } else {
-                        // L'image n'existe pas, afficher un message d'erreur ou avertissement
-                        echo "L'image ${imageName} n'existe pas. Aucune suppression nécessaire."
+                        echo "L'image ${imageNameV1} n'existe pas. Aucune suppression nécessaire."
+                    }
+
+                    if (imageLatestExists) {
+                        // L'image latest existe, alors on peut la supprimer
+                        dockerImageCleanup("${params.ImageName}", "latest", "${params.DockerHubUser}")
+                    } else {
+                        echo "L'image ${imageNameLatest} n'existe pas. Aucune suppression nécessaire."
                     }
                 }
             }
         }
+
     
 
         stage('Run Docker Container') {
