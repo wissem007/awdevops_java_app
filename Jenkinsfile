@@ -102,30 +102,12 @@ pipeline{
             }
         }
 
-        stage('Docker Image Cleanup : DockerHub') {
+        stage('Clean Image') {
             when { expression { params.action == 'create' } }
             steps {
                 script {
-                    // Vérifier si l'image existe avant de la supprimer
-                    def imageNameV1 = "${params.ImageName}:v1"
-                    def imageNameLatest = "${params.ImageName}:latest"
-
-                    def imageV1Exists = sh(returnStatus: true, script: "docker images -q ${imageNameV1}").trim()
-                    def imageLatestExists = sh(returnStatus: true, script: "docker images -q ${imageNameLatest}").trim()
-
-                    if (imageV1Exists) {
-                        // L'image v1 existe, alors on peut la supprimer
-                        dockerImageCleanup("${params.ImageName}", "v1", "${params.DockerHubUser}")
-                    } else {
-                        echo "L'image ${imageNameV1} n'existe pas. Aucune suppression nécessaire."
-                    }
-
-                    if (imageLatestExists) {
-                        // L'image latest existe, alors on peut la supprimer
-                        dockerImageCleanup("${params.ImageName}", "latest", "${params.DockerHubUser}")
-                    } else {
-                        echo "L'image ${imageNameLatest} n'existe pas. Aucune suppression nécessaire."
-                    }
+                    // Supprimer l'image Docker après avoir exécuté le conteneur
+                    dockerImageCleanup("${params.ImageName}", "${params.ImageTag}", "${params.DockerHubUser}")
                 }
             }
         }
