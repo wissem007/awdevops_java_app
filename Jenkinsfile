@@ -1,7 +1,7 @@
 @Library('my-shared-library') _
 pipeline{
-    //agent any
-    agent {label 'dockerprod'}
+    agent any
+    // agent {label 'dockerprod'}
 
     parameters{
 
