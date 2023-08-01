@@ -102,15 +102,6 @@ pipeline{
             }
         }
 
-        stage('Clean Image') {
-            when { expression { params.action == 'create' } }
-            steps {
-                script {
-                    // Supprimer l'image Docker après avoir exécuté le conteneur
-                    dockerImageCleanup("${params.ImageName}", "${params.ImageTag}", "${params.DockerHubUser}")
-                }
-            }
-        }
 
         stage('Run Docker Container') {
              when { expression { params.action == 'create' } }
@@ -120,7 +111,18 @@ pipeline{
                      dockerImageRun("${params.ImageName}", "${params.ImageTag}", "${params.portMapping}", "${params.DockerHubUser}")
         }
         }
-    }
+        }
+
+        
+        stage('Clean Image') {
+            when { expression { params.action == 'create' } }
+            steps {
+                script {
+                    // Supprimer l'image Docker après avoir exécuté le conteneur
+                    dockerImageCleanup("${params.ImageName}", "${params.ImageTag}", "${params.DockerHubUser}")
+                }
+            }
+        }
 
 
 
