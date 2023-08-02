@@ -114,19 +114,27 @@ pipeline{
         }
 
 
-        stage('Run Docker Container') {
-             when { expression { params.action == 'create' } }
-                 steps {
-                    script {
-                        // sh "docker container run -d -p 8088:8080 --name app wissem007/javapp:v1"
-                     dockerImageRun("${params.ImageName}", "${params.ImageTag}", "${params.portMapping}", "${params.DockerHubUser}")
-        }
-        }
-        }
+
+
+        // stage('Run Docker Container') {
+        //      when { expression { params.action == 'create' } }
+        //          steps {
+        //             script {
+        //                 // sh "docker container run -d -p 8088:8080 --name app wissem007/javapp:v1"
+        //              dockerImageRun("${params.ImageName}", "${params.ImageTag}", "${params.portMapping}", "${params.DockerHubUser}")
+        // }
+        // }
+        // }
 
     
 
 
 
    }
+
+       post {
+        always {
+            mail bcc: '', body: "<br>Project: ${env.JOB_NAME} <br>Build Number: ${env.BUILD_NUMBER} <br> URL de build: ${env.BUILD_URL}", cc: '', charset: 'UTF-8', from: '', mimeType: 'text/html', replyTo: '', subject: "${currentBuild.result} CI: Project name -> ${env.JOB_NAME}", to: "solutiontechnologysystem@gmail.com";  
+        }
+    }
 }
